@@ -1,9 +1,20 @@
+import tkinter as tk
+
 class Board:
-    def __init__(self):
+    def __init__(self, master):
         self.grid = [[0,0,0], [0,0,0], [0,0,0]]
         self.buttons = []
         self.player = "X"
         self.turn = 0
+        self.master = master
+        self.window = tk.PanedWindow(self.master, orient = "vertical")
+        tk.Button(self.window, text = "Restart", command = self.restart).grid(row = 3, column = 1)
+        
+    def show(self):
+        self.window.place(relx = 0.5, rely = 0.5, anchor = "center")
+        
+    def hide(self):
+        self.window.place_forget()
         
     def PlaceObject(self, column, row, player):
         self.grid[row][column] = player
@@ -38,3 +49,9 @@ class Board:
     def disableButtons(self):
         for button in self.buttons:
             button["state"] = "disabled"
+    
+    def enableButtons(self):
+        for i in range(len(self.grid)):
+            for j in range(i):
+                if self.grid[i][j] == 0:
+                    self.buttons[i][j]["state"] = "normal"

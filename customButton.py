@@ -7,9 +7,10 @@ def popupmsg(msg, root):
     tk.Button(popup, text="Okay", command = popup.place_forget).place(relx = 0.5, rely = 1, anchor = "s")
 
 class CustomButton(tk.Button):
-    def __init__(self, master, row, column, board):
-        tk.Button.__init__(self, master, text = " ", command = self.update, height = 5, width = 10)
-        self.master = master
+    def __init__(self, row, column, board):
+        self.master = board.window
+        tk.Button.__init__(self, self.master, text = " ", command = self.update, height = 5, width = 10)
+        self.master.add(self)
         self.row = row
         self.column = column
         self.board = board
