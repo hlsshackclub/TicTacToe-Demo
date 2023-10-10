@@ -34,3 +34,4 @@ class CustomButton(tk.Button):
     def reset(self):
         self["text"] = " "
         self["state"] = "normal"
+        self.board.turn = 0
