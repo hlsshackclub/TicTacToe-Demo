@@ -27,20 +27,27 @@ class TicTacToeServer:
         client_socket.send("Enter 'JOIN game_id' to join an existing game or 'CREATE' to create a new game.".encode())
         data = client_socket.recv(1024).decode()
         
+        other_player = None
+        
         if data.startswith("CREATE"):
             # Create a new game session
             game_id = uuid.uuid4().hex[:6].upper()
             self.games[game_id] = {"players": [client_socket], "board": None}
             client_socket.send(f"Game {game_id} created. You are player 1.".encode())
+            print(game_id)
         elif data.startswith("JOIN"):
             # Extract the game_id and join an existing game
             _, game_id = data.split()
             if game_id in self.games and len(self.games[game_id]["players"]) < 2:
                 self.games[game_id]["players"].append(client_socket)
                 client_socket.send(f"Joined game {game_id} as player 2.".encode())
+                other_player = self.games[game_id]["players"][0]
+                print("Joined game " + game_id + " as player 2.")
                 # Initialize the game board here if needed
             else:
                 client_socket.send("Invalid game ID or the game is full.".encode())
+                print("Invalid game ID or the game is full.")
+                
         else:
             client_socket.send("Invalid command. Enter 'JOIN game_id' or 'CREATE game_id'.".encode())
 
@@ -50,6 +57,14 @@ class TicTacToeServer:
             if not data:
                 break
             # Handle incoming messages for game moves, restart requests, etc.
+            if (data.startswith("MOVE")):
+                # Extract the row and column
+                _, row, column = data.split()
+                # Send updates to the clients
+                if other_player is None:
+                    other_player = self.games[game_id]["players"][1]
+                other_player.send(data.encode())
+            
             # Update the game state accordingly and send updates to the clients.
 
         # Clean up when a client disconnects or the game ends

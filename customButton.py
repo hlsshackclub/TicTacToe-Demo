@@ -7,13 +7,14 @@ def popupmsg(msg, root):
     tk.Button(popup, text="Okay", command = popup.place_forget).place(relx = 0.5, rely = 1, anchor = "s")
 
 class CustomButton(tk.Button):
-    def __init__(self, row, column, board):
+    def __init__(self, row, column, board, client_socket):
         self.master = board.window
         tk.Button.__init__(self, self.master, text = " ", command = self.update, height = 5, width = 10)
         self.master.add(self)
         self.row = row
         self.column = column
         self.board = board
+        self.client_socket = client_socket
         self.grid(row = row, column = column)
         
     def update(self):
@@ -31,6 +32,11 @@ class CustomButton(tk.Button):
             self.board.disableButtons()
         else:
             self.board.player = "X" if self.board.player == "O" else "O"
+            
+        if(self.board.isMultiPlayer):
+            self.board.disableButtons()
+            self.client_socket.send(("MOVE " + str(self.row) + " " + str(self.column)).encode())
+            self.board.waitForMove()
         
     def reset(self):
         self["text"] = " "
