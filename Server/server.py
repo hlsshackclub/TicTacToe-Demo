@@ -64,6 +64,7 @@ class TicTacToeServer:
                 if other_player is None:
                     other_player = self.games[game_id]["players"][1]
                 other_player.send(data.encode())
+                print(data)
             
             # Update the game state accordingly and send updates to the clients.
 

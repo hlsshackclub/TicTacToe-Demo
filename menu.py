@@ -18,12 +18,13 @@ def entrypopup(msg, root):
 
 #main menu for tictactoe with a single player and multiplayer option
 class MainMenu:
-    def __init__(self, board, master, client_socket):
+    def __init__(self, board, master, api, manager):
         #create the window
         self.board = board
         self.master = master
         self.window = tk.PanedWindow(self.master, orient = "vertical")
-        self.client_socket = client_socket
+        self.api = api
+        self.manager = manager
         
         #add the buttons
         tk.Button(self.window, text = "Single Player", command = self.singlePlayer).grid(row = 0, column = 0)
@@ -41,6 +42,8 @@ class MainMenu:
         
     def multiplayer(self):
         self.hide()
+        self.api.connect()
+        self.manager.start()
         #create a new window to ask if the player wants to create or join a game
         menu = tk.PanedWindow(self.master, orient = "vertical")
         tk.Button(menu, text = "Create Game", command = lambda: self.createGame(menu)).grid(row = 0, column = 0)
@@ -49,13 +52,11 @@ class MainMenu:
         
     def createGame(self, menu):
         menu.place_forget()
-        self.client_socket.send("CREATE".encode())
-        answer = self.client_socket.recv(1024).decode()
-        print(answer)
+        self.api.sendMesg("CREATE")
         self.board.multiPlayer(0)
         
     def joinGame(self, menu):
         gameID = entrypopup("Enter the game ID", self.master)
-        self.client_socket.send(("JOIN " + gameID).encode())
+        self.api.sendMesg("JOIN " + gameID)
         menu.place_forget()
         self.board.multiPlayer(1)

@@ -1,7 +1,7 @@
 import tkinter as tk
 
 class Board:
-    def __init__(self, master, client_socket):
+    def __init__(self, master):
         self.grid = [[0,0,0], [0,0,0], [0,0,0]]
         self.buttons = []
         self.player = "X"
@@ -10,17 +10,7 @@ class Board:
         self.isMultiPlayer = False
         self.master = master
         self.window = tk.PanedWindow(self.master, orient = "vertical")
-        self.client_socket = client_socket
         tk.Button(self.window, text = "Restart", command = self.restart).grid(row = 3, column = 1)
-    
-    def waitForMove(self):
-        while True:
-            data = self.client_socket.recv(1024).decode()
-            if(data.startswith("MOVE")):
-                row, column = data.split(" ")[1:]
-                self.buttons[int(row)*int(column)].update()
-                self.enableButtons()
-                break
     
     def singlePlayer(self):
         self.isMultiPlayer = False
@@ -30,6 +20,8 @@ class Board:
     def multiPlayer(self, playernum):
         self.isMultiPlayer = True
         self.playernum = playernum
+        if(playernum == 1):
+            self.player = "O"
         self.show()
         self.restart()
     
@@ -75,6 +67,8 @@ class Board:
     
     def enableButtons(self):
         for i in range(len(self.grid)):
-            for j in range(i):
+            for j in range(len(self.grid[i])):
+                print(i, j)
                 if self.grid[i][j] == 0:
-                    self.buttons[i][j]["state"] = "normal"
+                    print("enable")
+                    self.buttons[((i)*3)+j]["state"] = "normal"
